@@ -1,0 +1,37 @@
+{
+  "name": "activity-service",
+  "version": "0.1.0",
+  "description": "Solana Activity Service Contract",
+  "main": "index.js",
+  "scripts": {
+    "test": "anchor test",
+    "build": "anchor build",
+    "deploy": "anchor deploy",
+    "deploy:devnet": "anchor deploy --provider.cluster devnet",
+    "test:devnet": "node scripts/test.js"
+  },
+  "keywords": [
+    "solana",
+    "anchor",
+    "activity",
+    "service"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.29.0",
+    "@solana/web3.js": "^1.87.6",
+    "@solana/spl-token": "^0.3.9",
+    "bs58": "^5.0.0",
+    "buffer": "^6.0.3"
+  },
+  "devDependencies": {
+    "@types/bn.js": "^5.1.0",
+    "@types/chai": "^4.3.0",
+    "@types/mocha": "^9.0.0",
+    "chai": "^4.3.0",
+    "mocha": "^9.0.0",
+    "ts-mocha": "^10.0.0",
+    "typescript": "^4.3.5"
+  }
+}
