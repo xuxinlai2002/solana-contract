@@ -7,7 +7,7 @@ async function main() {
     console.log("=============================");
 
     // 程序配置
-    const programId = new PublicKey("FjdoH37XGjZHeY4x3GXBgZfvVx5bEhrKtxushCmxXyWN");
+    const programId = new PublicKey("CvpHN1JUdyJ9RPMvtUBHZPthsCUnDfVTcj7Gy16J7tcY");
     
     console.log("📋 Program Information:");
     console.log(`Program ID: ${programId.toString()}`);
