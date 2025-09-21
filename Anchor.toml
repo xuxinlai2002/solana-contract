@@ -3,7 +3,7 @@ seeds = false
 skip-lint = false
 
 [programs.devnet]
-activity_service = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
+activity_service = "DMKWzYe9vsSqXUD81o5UyA3sfkPa789Qg8iJPBdH3bZA"
 
 [programs.localnet]
 activity_service = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
@@ -20,3 +20,6 @@ test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
 
 [test]
 startup_wait = 5000
+
+[toolchain]
+anchor_version = "0.29.0"

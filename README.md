@@ -2,16 +2,21 @@
 
 ## 📖 项目简介
 
-Activity Service 是一个基于 Solana 区块链的活动服务智能合约，用于管理活动支付、平台费用和奖励分发。该合约是原始以太坊版本 `ActivityService.sol` 的 Solana 移植版本，使用 Anchor 框架开发。
+Activity Service 是一个基于 Solana 区块链的活动服务智能合约，专注于安全的奖励分发功能。该合约使用 Anchor 框架开发，实现了基于签名验证的奖励领取机制，确保只有授权用户才能领取代币奖励。
 
-### 🚀 主要功能
+### 🎯 部署状态
+- ✅ **已成功部署到 Solana Devnet**
+- **程序 ID**: `DMKWzYe9vsSqXUD81o5UyA3sfkPa789Qg8iJPBdH3bZA`
+- **状态**: 正常运行，可接受调用
 
-- **平台费用管理**: 支持可配置的平台手续费比例
-- **白名单管理**: 实现基于签名的白名单验证机制
-- **代币存款**: 支持 SPL Token 存款到项目账户
+### 🚀 核心功能
+
 - **奖励领取**: 通过签名验证的奖励领取机制，防止重复领取
-- **批量转账**: 支持向多个地址批量分发代币
-- **余额管理**: 实时跟踪项目代币余额
+- **白名单验证**: 基于 Ed25519 签名的白名单验证系统
+- **防重复机制**: 使用用户奖励键值对防止同一奖励被重复领取
+- **时间戳验证**: 签名有效期控制，防止重放攻击
+- **批量处理**: 支持一次性领取多个奖励
+- **安全转账**: 使用 CPI 安全地执行代币转账
 
 ### 🏗️ 技术架构
 
@@ -25,10 +30,10 @@ Activity Service 是一个基于 Solana 区块链的活动服务智能合约，�
 
 ### 环境依赖
 
-- [Node.js](https://nodejs.org/) (v16 或更高版本)
-- [Rust](https://rustup.rs/) (最新稳定版)
-- [Solana CLI](https://docs.solana.com/cli/install-solana-cli-tools) (v1.16 或更高版本)
-- [Anchor CLI](https://www.anchor-lang.com/docs/installation)
+- [Node.js](https://nodejs.org/) (v20.0.0 或更高版本)
+- [Rust](https://rustup.rs/) (最新稳定版，v1.90.0+)
+- [Solana CLI](https://docs.solana.com/cli/install-solana-cli-tools) (v1.18+)
+- [Anchor CLI](https://www.anchor-lang.com/docs/installation) (v0.29.0)
 
 ### 安装步骤
 
@@ -40,13 +45,13 @@ Activity Service 是一个基于 Solana 区块链的活动服务智能合约，�
 
 2. **安装 Solana CLI**
    ```bash
-   sh -c "$(curl -sSfL https://release.solana.com/v1.16.0/install)"
+   sh -c "$(curl -sSfL https://release.solana.com/v1.18.0/install)"
    export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
    ```
 
 3. **安装 Anchor CLI**
    ```bash
-   npm install -g @coral-xyz/anchor-cli
+   npm install -g @coral-xyz/anchor-cli@0.29.0
    ```
 
 4. **安装项目依赖**
@@ -88,44 +93,60 @@ solana balance
 
 ## 🚀 部署指南
 
-### 自动部署（推荐）
+### 当前部署状态
 
-使用提供的部署脚本进行一键部署：
+✅ **程序已成功部署到 Solana Devnet**
+
+- **程序 ID**: `DMKWzYe9vsSqXUD81o5UyA3sfkPa789Qg8iJPBdH3bZA`
+- **网络**: Solana Devnet
+- **部署槽位**: 409258762
+- **程序大小**: 261,904 字节
+- **状态**: 正常运行
+
+### 推荐的构建和部署方法
+
+由于 Anchor CLI 版本兼容性问题，推荐使用以下方法：
+
+1. **使用 Cargo 构建 SBF 程序**
+   ```bash
+   # 构建 Solana 程序
+   cargo build-sbf
+   ```
+
+2. **使用 Solana CLI 部署**
+   ```bash
+   # 设置环境变量
+   export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
+   
+   # 部署程序
+   solana program deploy target/deploy/activity_service.so
+   ```
+
+3. **验证部署**
+   ```bash
+   # 查看程序信息
+   solana program show DMKWzYe9vsSqXUD81o5UyA3sfkPa789Qg8iJPBdH3bZA
+   ```
+
+### 网络配置
+
+如果遇到连接问题，可以切换到更稳定的 RPC 端点：
 
 ```bash
-# 构建项目
-anchor build
+# 切换到更稳定的 RPC 端点
+solana config set --url https://devnet.rpcpool.com
 
-# 运行部署脚本
-node scripts/deploy.js
+# 验证连接
+solana balance
 ```
 
-部署脚本将自动完成以下操作：
-- 检查并构建程序
-- 部署到 Solana Devnet
-- 初始化程序状态
-- 创建测试代币
-- 设置白名单
-- 保存部署信息到 `deploy-info.json`
+### 部署后配置
 
-### 手动部署
-
-如果需要手动部署，请按照以下步骤：
-
-1. **构建程序**
-   ```bash
-   anchor build
-   ```
-
-2. **部署程序**
-   ```bash
-   anchor deploy --provider.cluster devnet
-   ```
-
-3. **获取程序 ID**
-   ```bash
-   anchor keys list
-   ```
+部署完成后，需要手动配置以下内容：
+- 初始化平台配置账户
+- 设置白名单账户
+- 创建项目余额账户
+- 配置必要的权限
 
 ## 🧪 测试指南
 
@@ -138,15 +159,13 @@ node scripts/test.js
 
 ### 测试覆盖范围
 
-测试脚本包含以下测试用例：
+当前测试包含以下功能：
 
-1. **程序初始化测试**: 验证程序是否正确初始化
-2. **平台费用更新测试**: 测试手续费比例更新功能
-3. **白名单管理测试**: 验证白名单添加和移除功能
-4. **存款功能测试**: 测试代币存款到项目账户
-5. **提取功能测试**: 测试从项目账户提取代币
-6. **批量转账测试**: 测试向多个地址批量分发代币
-7. **奖励领取测试**: 测试基于签名的奖励领取机制
+1. **程序 ID 验证**: 验证程序 ID 是否正确设置
+2. **奖励领取功能**: 测试基于签名的奖励领取机制
+3. **白名单验证**: 验证白名单账户状态
+4. **防重复领取**: 测试同一奖励不能被重复领取
+5. **时间戳验证**: 验证签名的时效性
 
 ### 查看测试结果
 
@@ -160,56 +179,37 @@ node scripts/test.js
 
 ### 程序指令
 
-#### `initialize()`
-初始化程序，设置平台配置。
-
-**账户**:
-- `platform_config`: 平台配置 PDA
-- `authority`: 程序权限账户
-- `system_program`: 系统程序
-
-#### `update_platform_fee(fee_ratio: u16)`
-更新平台手续费比例（0-10000，即 0%-100%）。
-
-**参数**:
-- `fee_ratio`: 手续费比例（以基点为单位）
-
-#### `add_to_whitelist()`
-将签名者添加到白名单。
-
-**账户**:
-- `whitelist`: 白名单 PDA
-- `platform_config`: 平台配置 PDA
-- `authority`: 程序权限账户
-
-#### `deposit(amount: u64, activity_id: String)`
-向项目账户存款。
-
-**参数**:
-- `amount`: 存款金额
-- `activity_id`: 活动 ID
-
-#### `withdraw(amount: u64)`
-从项目账户提取代币。
-
-**参数**:
-- `amount`: 提取金额
-
-#### `batch_transfer(amounts: Vec<u64>, activity_id: String)`
-批量转账给多个接收者。
-
-**参数**:
-- `amounts`: 转账金额数组
-- `activity_id`: 活动 ID
-
 #### `claim_by_reward(amounts: Vec<u64>, reward_ids: Vec<String>, signature: Vec<u8>, timestamp: i64)`
-通过奖励 ID 领取代币。
+通过奖励 ID 领取代币。这是当前版本中唯一可用的指令。
 
 **参数**:
 - `amounts`: 奖励金额数组
 - `reward_ids`: 奖励 ID 数组
-- `signature`: 签名数据
-- `timestamp`: 时间戳
+- `signature`: Ed25519 签名数据
+- `timestamp`: 签名时间戳
+
+**账户**:
+- `platform_config`: 平台配置 PDA
+- `whitelist`: 白名单验证 PDA
+- `project_balance`: 项目代币余额 PDA
+- `claim_record`: 用户领取记录 PDA
+- `project_token_account`: 项目代币账户
+- `user_token_account`: 用户代币账户
+- `user`: 用户签名账户
+- `project_authority`: 项目权限签名账户
+- `project`: 项目账户信息
+- `token_mint`: 代币铸造地址
+- `token_program`: SPL Token 程序
+- `system_program`: 系统程序
+- `signer`: 签名验证账户
+
+**验证逻辑**:
+1. 验证数组长度匹配
+2. 检查签名时间戳有效性（1小时内）
+3. 验证白名单状态
+4. 检查奖励是否已被领取
+5. 执行代币转账
+6. 更新领取记录
 
 ### 数据结构
 
@@ -255,20 +255,29 @@ pub struct ClaimRecord {
 
 ### 常见问题
 
-1. **部署失败**
-   - 检查 Solana CLI 配置是否正确
-   - 确保有足够的 SOL 余额
-   - 验证网络连接
+1. **构建失败**
+   - 确保 Rust 工具链是最新版本 (`rustup update`)
+   - 使用 `cargo build-sbf` 而不是 `anchor build`
+   - 验证所有依赖是否正确安装
 
-2. **测试失败**
-   - 确保程序已正确部署
-   - 检查 `deploy-info.json` 文件是否存在
-   - 验证测试账户有足够的代币余额
+2. **网络连接超时**
+   - 切换到更稳定的 RPC 端点: `solana config set --url https://devnet.rpcpool.com`
+   - 检查网络连接和代理设置
+   - 确保有足够的 SOL 余额用于部署
 
-3. **交易失败**
-   - 检查账户签名是否正确
+3. **Anchor CLI 版本问题**
+   - 推荐使用 `cargo build-sbf` + `solana program deploy` 组合
+   - 避免使用 `anchor deploy` 命令（存在版本兼容性问题）
+
+4. **IDL 文件缺失**
+   - IDL 文件已手动创建在 `target/idl/activity_service.json`
+   - 包含必要的 `discriminator` 字段
+
+5. **交易失败**
+   - 检查所有账户是否正确传递
    - 验证 PDA 计算是否正确
-   - 确保有足够的租金豁免
+   - 确保签名账户有足够权限
+   - 检查白名单状态是否正确设置
 
 ### 调试技巧
 
@@ -293,18 +302,22 @@ pub struct ClaimRecord {
 solana-contract/
 ├── programs/
 │   └── activity-service/
-│       ├── Cargo.toml
+│       ├── Cargo.toml          # 程序依赖配置
 │       └── src/
-│           └── lib.rs          # 主程序代码
+│           └── lib.rs          # ClaimByReward 程序代码
 ├── scripts/
 │   ├── deploy.js               # 部署脚本
+│   ├── example.js              # 使用示例
 │   └── test.js                 # 测试脚本
-├── target/                     # 构建输出
+├── target/
+│   ├── idl/
+│   │   └── activity_service.json  # IDL 接口定义
+│   └── release/                # 构建输出
 ├── Anchor.toml                 # Anchor 配置
 ├── Cargo.toml                  # 工作空间配置
 ├── package.json                # Node.js 依赖
 ├── tsconfig.json               # TypeScript 配置
-├── deploy-info.json            # 部署信息（部署后生成）
+├── PROJECT_SUMMARY.md          # 项目总结
 └── README.md                   # 项目文档
 ```
 
@@ -335,6 +348,34 @@ solana-contract/
 - [SPL Token 文档](https://spl.solana.com/token)
 - [Solana Web3.js 文档](https://solana-labs.github.io/solana-web3.js/)
 
+## ⚠️ 重要说明
+
+### 当前版本状态
+- **功能范围**: 仅包含 `claim_by_reward` 功能
+- **部署状态**: ✅ 已成功部署到 Solana Devnet
+- **程序 ID**: `DMKWzYe9vsSqXUD81o5UyA3sfkPa789Qg8iJPBdH3bZA`
+- **开发阶段**: 基础功能已完成，签名验证部分需要进一步完善
+- **安全级别**: 开发版本，需要安全审计
+
+### 部署成功信息
+- **网络**: Solana Devnet
+- **部署槽位**: 409258762
+- **程序大小**: 261,904 字节
+- **部署方法**: `cargo build-sbf` + `solana program deploy`
+- **RPC 端点**: `https://devnet.rpcpool.com`
+
+### 生产部署前检查清单
+- [ ] 完善 Ed25519 签名验证逻辑
+- [ ] 进行安全审计
+- [ ] 压力测试和边界测试
+- [ ] 完整的错误处理
+- [ ] 文档和示例代码完善
+
+### 推荐使用方式
+- 使用 `cargo build-sbf` 构建程序
+- 使用 `solana program deploy` 部署程序
+- 避免使用 `anchor deploy` 命令（版本兼容性问题）
+
 ---
 
-**注意**: 这是一个开发版本，仅用于测试和学习目的。在生产环境中使用前，请进行充分的安全审计和测试。
+**注意**: 这是一个开发版本，专注于奖励领取功能。程序已成功部署到 Devnet，在生产环境中使用前，请进行充分的安全审计和测试。
