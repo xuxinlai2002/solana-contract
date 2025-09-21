@@ -2,7 +2,7 @@
 use anchor_lang::prelude::*;
 
 // 本合约地址
-declare_id!("FjdoH37XGjZHeY4x3GXBgZfvVx5bEhrKtxushCmxXyWN");
+declare_id!("CvpHN1JUdyJ9RPMvtUBHZPthsCUnDfVTcj7Gy16J7tcY");
 
 // 程序宏
 #[program]
@@ -70,7 +70,7 @@ pub struct CreateCounter<'info> {
         seeds = [authority.key().as_ref()],
         bump,
         payer = authority,
-        space = Counter::LEN
+        space = 100
     )]
     pub counter: Account<'info, Counter>,
 
@@ -97,11 +97,4 @@ pub struct Counter {
     pub authority: Pubkey,
     // 计数器数字
     pub count: u64,
-}
-
-// 为Counter结构体实现空间计算
-impl Counter {
-    pub const LEN: usize = 8 + // discriminator
-        32 + // authority (Pubkey)
-        8;   // count (u64)
 }
